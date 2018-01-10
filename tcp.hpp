@@ -9,21 +9,21 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#ifdef _win32
+#define NET_FAIL   -1
+#define NET_SUCCESS 0
+
+#ifdef _WIN32
 typedef SOCKET sock_t;
 #else
 typedef int sock_t;
+#define INVALID_SOCKET -1
 #endif
 
 
 
 namespace tcp {
 
-	class stream;
-
-	sock_t socket() {
-		return (sock_t)::socket(AF_INET, SOCK_STREAM, 0);
-	}
+	sock_t socket();
 
 	class stream {
 		struct sockaddr_in	m_addr;
@@ -31,24 +31,15 @@ namespace tcp {
 	public:
 		stream(sock_t sock, struct sockaddr_in addr);
 		stream(tcp::stream * s);
-		~stream() { close(); }
+		~stream();
 
-		int send(const void * buf, size_t buflen) {
-			if (m_sock != -1)
-				return ::send(m_sock, buf, buflen, 0);
-			return m_sock;
-		}
-		int recv(void * buf, size_t buflen) {
-			if (m_sock != -1)
-				return ::recv(m_sock, buf, buflen, 0);
-			return m_sock;
-		}
-
-		void close() {
-			if (m_sock != -1)
-				::close(m_sock);
-		}
+		int send(const void * buf, size_t buflen);
+		int recv(void * buf, size_t buflen);
+		void close();
 	}
+
+	// tcp::stream * connect(const char * ipv4, uint16_t port);
+	int connect(const char * ipv4, uint16_t port, tcp::stream * s);
 }
 
 

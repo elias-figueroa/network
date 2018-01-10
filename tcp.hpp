@@ -33,12 +33,12 @@ namespace tcp {
 		stream(tcp::stream * s);
 		~stream() { close(); }
 
-		int send(char * buf, size_t buflen) {
+		int send(const void * buf, size_t buflen) {
 			if (m_sock != -1)
 				return ::send(m_sock, buf, buflen, 0);
 			return m_sock;
 		}
-		int recv(char * buf, size_t buflen) {
+		int recv(void * buf, size_t buflen) {
 			if (m_sock != -1)
 				return ::recv(m_sock, buf, buflen, 0);
 			return m_sock;
@@ -49,31 +49,6 @@ namespace tcp {
 				::close(m_sock);
 		}
 	}
-
-	class smart_stream: private tcp::stream {
-	public:
-		int send_string(char * buf, size_t buflen) {
-			return this->send(buf, buflen);
-		}
-		int recv_string(char * buf, size_t buflen) {
-			int n = this->recv(buf, buflen);
-			buf[(n != -1) ? n : 0] = '\0';
-			return n;
-		}
-
-		int send_int(int value) {
-			char buf[sizeof(int) + 1];
-
-			// get endiannes
-			return -1;
-		}
-		int recv_int(int * p) {
-			return -1;
-		}
-
-		
-	}
-
 }
 
 
